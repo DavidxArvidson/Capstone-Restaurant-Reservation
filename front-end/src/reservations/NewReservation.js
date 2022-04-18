@@ -27,7 +27,7 @@ export default function NewReservation() {
 
 	
 	function validateDate() {
-		const reserveDate = new Date(formData.reservation_date);
+		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
 		const todaysDate = new Date();
 		const foundErrors = [];
 		
@@ -36,6 +36,13 @@ export default function NewReservation() {
 		}
 		if (reserveDate < todaysDate) {
 			foundErrors.push({ message: "Reservations cannot be made on a past date." });
+		}
+		if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+			foundErrors.push({ message: "Unfortunately, we are not open until 10:30AM." });
+		} else if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+			foundErrors.push({ message: "Unfortunately, we close at 10:30PM." });
+		} else if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+			foundErrors.push({ message: "Unfortunately, reservations must be made at least an hour before we close at 10:30PM." })
 		}
 
 		setErrors(foundErrors);
