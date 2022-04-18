@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import ErrorAlert from "../layout/ErrorAlert";
 
 export default function NewReservation() {
 	const history = useHistory();
@@ -11,6 +12,7 @@ export default function NewReservation() {
 		reservation_time: "",
 		people: 0,
 	});
+	const [errors, setErrors] = useState([]);
 
 	function handleChange({ target }) {
 		setFormData({ ...formData, [target.name]: target.value });
@@ -18,11 +20,38 @@ export default function NewReservation() {
 
 	function handleSubmit(event) {
 		event.preventDefault();
-		history.push(`/dashboard?date=${formData.reservation_date}`);
+		if (validateDate()) {
+			history.push(`/dashboard?date=${formData.reservation_date}`);
+		}
+	}
+
+	
+	function validateDate() {
+		const reserveDate = new Date(formData.reservation_date);
+		const todaysDate = new Date();
+		const foundErrors = [];
+		
+		if (reserveDate.getDay() === 2) {
+			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays and so reservations cannot be made for your chosen date." });
+		}
+		if (reserveDate < todaysDate) {
+			foundErrors.push({ message: "Reservations cannot be made on a past date." });
+		}
+
+		setErrors(foundErrors);
+		if (foundErrors.length > 0) {
+			return false;
+		}
+		return true;
+	}
+
+	const collectErrors = () => {
+		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
 	}
 
 	return (
 		<form>
+			{collectErrors()}
 			<label htmlFor="first_name">First Name:&nbsp;</label>
 			<input
 				name="first_name"
