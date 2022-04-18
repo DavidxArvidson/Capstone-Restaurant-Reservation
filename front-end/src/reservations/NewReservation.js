@@ -31,8 +31,8 @@ export default function NewReservation() {
 		const todaysDate = new Date();
 		const foundErrors = [];
 		
-		if (reserveDate.getDay() === 2) {
-			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays and so reservations cannot be made for your chosen date." });
+		if (reserveDate.getDay() === 1) {
+			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays." });
 		}
 		if (reserveDate < todaysDate) {
 			foundErrors.push({ message: "Reservations cannot be made on a past date." });
