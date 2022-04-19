@@ -1,9 +1,9 @@
 import React from "react";
 
 export default function ReservationTableComp({ reservation }) {
-	if (!reservation) {
-        return null;
-    }
+	if (!reservation || reservation.status === "finished") {
+		return null;
+	}
 
 	return (
 		<tr>
@@ -14,13 +14,15 @@ export default function ReservationTableComp({ reservation }) {
 			<td>{reservation.mobile_number}</td>
 			<td>{reservation.reservation_time}</td>
 			<td>{reservation.people}</td>
-			<td>{reservation.status}</td>
+			<td data-reservation-id-status={reservation.reservation_id}>{reservation.status}</td>
 			
-			<td>
-				<a href={`/reservations/${reservation.reservation_id}/seat`}>
-					<button type="button">Seat</button>
-				</a>
-			</td>
+			{reservation.status === "booked" &&
+				<td>
+					<a href={`/reservations/${reservation.reservation_id}/seat`}>
+						<button type="button">Seat</button>
+					</a>
+				</td>
+			}
 		</tr>
 	);
 }

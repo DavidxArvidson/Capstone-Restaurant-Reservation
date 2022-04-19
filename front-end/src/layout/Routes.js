@@ -8,7 +8,6 @@ import NewReservation from "../reservations/NewReservation";
 import ReservationSeat from "../reservations/ReservationSeat";
 import NewTable from "../tables/NewTable";
 import useQuery from "../utils/useQuery";
-import ReservationSeat from "../reservations/ReservationSeat";
 
 /**
  * Defines all the routes for the application.
