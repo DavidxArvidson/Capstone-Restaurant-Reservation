@@ -26,52 +26,55 @@ import TableTableComp from "./TableTableComp";
 
   return (
     <main>
-      <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for {date}</h4>
-      </div>
-      <ErrorAlert error={reservationsError} />
+      	<h1>Dashboard</h1>
+      	<div className="d-md-flex mb-3">
+        	<h4 className="mb-0">Reservations for {date}</h4>
+      	</div>
+      	<ErrorAlert error={reservationsError} />
 
-		  <table class="table">
-			  <thead>
-				  <tr>
-					  <th scope="col">ID</th>
-					  <th scope="col">First Name</th>
-					  <th scope="col">Last Name</th>
-					  <th scope="col">Mobile Number</th>
-					  <th scope="col">Time</th>
-					  <th scope="col">People</th>
-					  <th scope="col">Status</th>
-				  </tr>
-			  </thead>
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">First Name</th>
+					<th scope="col">Last Name</th>
+					<th scope="col">Mobile Number</th>
+					<th scope="col">Time</th>
+					<th scope="col">People</th>
+					<th scope="col">Status</th>
+					<th scope="col">Edit</th>
+					<th scope="col">Cancel</th>
+					<th scope="col">Seat</th>
+				</tr>
+			</thead>
 			
-			  <tbody>
-          {reservationsRow()}
-			  </tbody>
-		  </table>
+			<tbody>
+          		{reservationsRow()}
+			</tbody>
+		</table>
       
-		  <h4 className="mb-0">Tables</h4>
+		<h4 className="mb-0">Tables</h4>
 
-		  <ErrorAlert error={tablesError} />
+		<ErrorAlert error={tablesError} />
 
-		  <table class="table">
-			  <thead>
-			  	<tr>
-					  <th scope="col">ID</th>
-					  <th scope="col">Table Name</th>
-					  <th scope="col">Capacity</th>
-					  <th scope="col">Status</th>
-				  </tr>
-			  </thead>
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Table Name</th>
+					<th scope="col">Capacity</th>
+					<th scope="col">Status</th>
+				</tr>
+			</thead>
 				
-			  <tbody>
-				 {tablesRow()}
-			  </tbody>
-		  </table>
+			<tbody>
+				{tablesRow()}
+			</tbody>
+		</table>
 	  
-	  <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
-	  <button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
-	  <button type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next</button>
+	  	<button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
+	  	<button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
+	  	<button type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next</button>
     </main>
   );
 }
