@@ -27,9 +27,9 @@ export default function NewTable() {
 		let fieldError = null;
 
 		if (formData.table_name === "" || formData.capacity === "") {
-			foundError = { message: "All fields are required." };
+			fieldError = { message: "All fields are required." };
 		} else if (formData.table_name.length < 2) {
-			foundError = { message: "Your table name must have no fewer than 2 characters." };
+			fieldError = { message: "Your table name must have no fewer than 2 characters." };
 		}
 
 		setError(fieldError);
