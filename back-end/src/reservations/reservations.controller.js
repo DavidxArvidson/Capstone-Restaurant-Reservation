@@ -62,7 +62,7 @@ function validateDate(req, res, next) {
 	const reserveDate = new Date(`${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`);
 	const todaysDate = new Date();
 
-	if (reserveDate.getDay() === 1) {  
+	if (reserveDate.getDay() === 2) {  
 		return next({ status: 400, message: "Restauraunt is closed on tuesday" });
 	}
 
@@ -98,7 +98,7 @@ async function validateResId(req, res, next) {
     const reservation = await service.read(Number(reservation_id));
 
     if (!reservation) {
-        return next({ status: 404, message: `That reservation ID does not exist` });
+        return next({ status: 404, message: `That reservation ID: ${reservation_id} does not exist` });
     }
 
     res.locals.reservation = reservation;

@@ -17,11 +17,11 @@ async function validateData(req, res, next) {
 
 function validateBody(req, res, next) {
     if (!req.body.data.table_name || req.body.data.table_name === "") {
-        return next({ status: 400, message: "A table name is required" });
+        return next({ status: 400, message: "A table_name is required" });
     }
 
     if (req.body.data.table_name.length < 2) {
-        return next({ status: 400, message: "The table name must be at least two characters" });
+        return next({ status: 400, message: "The table_name must be at least two characters" });
     }
 
     if (!req.body.data.capacity || req.body.data.capacity === "") {
@@ -57,13 +57,13 @@ async function validateResId(req, res, next) {
     const { reservation_id } = req.body.data;
 
 	if (!reservation_id) {
-		return next({ status: 400, message: `A reservation ID must be included` });
+		return next({ status: 400, message: `A reservation_id must be included` });
 	}
 
     const reservation = await service.readRes(Number(reservation_id));
 
     if (!reservation) {
-        return next({ status: 404, message: `That reservation ID does not exist` });
+        return next({ status: 404, message: `That reservation ID: ${reservation_id} does not exist` });
     }
 
     res.locals.reservation = reservation;
@@ -81,7 +81,7 @@ async function validateSeat(req, res, next) {
 	}
 
     if (res.locals.table.capacity < res.locals.reservation.people) {
-        return next({ status: 400, message: `That table does not have enough room to seat ${res.locals.reservation.people} people` });
+        return next({ status: 400, message: `That table does not have the capacity to seat ${res.locals.reservation.people} people` });
     }
 
     next();
@@ -99,7 +99,7 @@ async function validateTableId(req, res, next) {
     const table = await service.read(table_id);
 
     if (!table) {
-        return next({ status: 404, message: `That table id does not exist` });
+        return next({ status: 404, message: `That table ID: ${table_id} does not exist.` });
     }
 
     res.locals.table = table;
