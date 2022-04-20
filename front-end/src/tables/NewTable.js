@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert"
+import { createTable } from "../utils/api";
 
 export default function NewTable() {
 	const history = useHistory();
@@ -12,15 +13,22 @@ export default function NewTable() {
 	});
 
 	function handleChange({ target }) {
-		setFormData({ ...formData, [target.name]: target.value });
+		setFormData({ ...formData, [target.name]: target.name === "capacity" ? Number(target.value) : target.value });
 	}
 
 	function handleSubmit(event) {
 		event.preventDefault();
 
+		const abortController = new AbortController();
+
 		if (validateFields()) {
-			history.push(`/dashboard`);
+			createTable(formData, abortController.signal)
+				.then(loadDashboard)
+				.then(() => history.push(`/dashboard`))
+				.catch(setError);
 		}
+
+		return () => abortController.abort();
 	}
 
 	function validateFields() {
@@ -34,7 +42,7 @@ export default function NewTable() {
 
 		setError(fieldError);
 
-		return fieldError.length !== null;
+		return fieldError === null;
 	}
 
 	return (

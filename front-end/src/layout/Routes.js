@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
@@ -23,14 +23,20 @@ function Routes() {
   const [tables, setTables] = useState([]);
 	const [tablesError, setTablesError] = useState(null);
   const query = useQuery();
-	const date = query.get("date");
+	const date = query.get("date") ? query.get("date") : today();
 
   function loadDashboard() {
     const abortController = new AbortController();
     setReservationsError(null);
-    listReservations({ date }, abortController.signal)
+    setTablesError(null);
+    listReservations({ date: date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
+
+      listTables(abortController.signal)
+			  .then((tables) => tables.sort((tableA, tableB) => tableA.table_id - tableB.table_id))
+			  .then(setTables)
+			  .catch(setTablesError);
     return () => abortController.abort();
   }
 
@@ -54,19 +60,23 @@ function Routes() {
 					loadDashboard={loadDashboard}
 				/>
 			</Route>
-      <Route exact={true} path="/reservations/new">
-	      <NewEditReservation />
+      <Route path="/reservations/new">
+	      <NewEditReservation 
+          loadDashboard={loadDashboard}
+        />
       </Route>
       <Route path="/reservations/:reservation_id/edit">
 	      <NewEditReservation 
-		      edit={true}
-		      reservations={reservations}
+		      loadDashboard={loadDashboard}
+					edit={true}
 	      />
       </Route>
       <Route path="/tables/new">
-				<NewTable />
+        <NewTable 
+				  loadDashboard={loadDashboard}
+				/>
 			</Route>
-      <Route exact={true} path="/reservations/:reservation_id/seat">
+      <Route path="/reservations/:reservation_id/seat">
         <ReservationSeat 
           tables={tables}
 					loadDashboard={loadDashboard}

@@ -1,36 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import ErrorAlert from "../layout/ErrorAlert";
+import { listReservations, seatTable } from "../utils/api";
 
-const tableOptions = () => {
-    return tables.map((table) => 
-        <option value={table.table_id}>{table.table_name} - {table.capacity}</option>);
-};
-
-export default function ReservationSeat({ reservations, tables }) {
+export default function ReservationSeat({ tables, loadDashboard }) {
 	const history = useHistory();
 	
 	const [tableId, setTableId] = useState(0);
+	const [reservations, setReservations] = useState([]);
+	const [reservationsError, setReservationsError] = useState(null);
 	const [errors, setErrors] = useState([]);
+	const [apiError, setApiError] = useState(null);
+	const { reservation_id } = useParams();
+
+	useEffect(() => {
+    	const abortController = new AbortController();
+
+    	setReservationsError(null);
+
+    	listReservations(null, abortController.signal)
+      		.then(setReservations)
+      		.catch(setReservationsError);
+
+    	return () => abortController.abort();
+  	}, []);
 
 	if (!tables || !reservations) return null;
 
-	// change handler sets tableId state
 	function handleChange({ target }) {
 		setTableId(target.value);
 	}
 
 	function handleSubmit(event) {
 		event.preventDefault();
+		const abortController = new AbortController();
 
-		if (validateSeat()) {
-			history.push(`/dashboard`);
+		if(validateSeat()) {
+			seatTable(reservation_id, table_id, abortController.signal)
+				.then(loadDashboard)
+				.then(() => history.push(`/dashboard`))
+				.catch(setApiError);
 		}
+
+		return () => abortController.abort();
 	}
 	
 	function validateSeat() {
 		const foundErrors = [];
 
-		const foundTable = tables.find((table) => table.table_id === tableId);
-		const foundReservation = reservations.find((reservation) => reservation.reservation_id === reservation_id);
+		const foundTable = tables.find((table) => table.table_id === Number(table_id));
+		const foundReservation = reservations.find((reservation) => reservation.reservation_id === Number(reservation_id));
 
 		if (!foundTable) {
 			foundErrors.push("This table does not exist.");
@@ -49,9 +68,22 @@ export default function ReservationSeat({ reservations, tables }) {
 
 		return foundErrors.length === 0;
 	}
+
+	const tableOptions = () => {
+		return tables.map((table) => 
+			<option value={table.table_id}>{table.table_name} - {table.capacity}</option>);
+	};
+
+	const errorsJSX = () => {
+		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
+	};
+
     
     return (
 		<form>
+			{errorsJSX()}
+			<ErrorAlert error={apiError} />
+			<ErrorAlert error={reservationsError} />
 		    <label htmlFor="table_id">Select table:</label>
 		    <select 
 	            name="table_id" 
@@ -59,7 +91,8 @@ export default function ReservationSeat({ reservations, tables }) {
 	            value={tableId}
 	            onChange={handleChange}
             >
-	            {tableOptions()}
+	            <option value={0}>Choose a table</option>
+				{tableOptions()}
             </select>
 
 		    <button type="submit" onClick={handleSubmit}>Submit</button>
