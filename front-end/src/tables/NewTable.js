@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert"
 import { createTable } from "../utils/api";
 
-export default function NewTable() {
+export default function NewTable({ loadDashboard }) {
 	const history = useHistory();
 
 	const [error, setError] = useState([]);

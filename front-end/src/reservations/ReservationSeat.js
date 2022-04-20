@@ -6,7 +6,7 @@ import { listReservations, seatTable } from "../utils/api";
 export default function ReservationSeat({ tables, loadDashboard }) {
 	const history = useHistory();
 	
-	const [tableId, setTableId] = useState(0);
+	const [table_id, setTableId] = useState(0);
 	const [reservations, setReservations] = useState([]);
 	const [reservationsError, setReservationsError] = useState(null);
 	const [errors, setErrors] = useState([]);
@@ -35,7 +35,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 		event.preventDefault();
 		const abortController = new AbortController();
 
-		if(validateSeat()) {
+		if (validateSeat()) {
 			seatTable(reservation_id, table_id, abortController.signal)
 				.then(loadDashboard)
 				.then(() => history.push(`/dashboard`))
@@ -88,7 +88,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 		    <select 
 	            name="table_id" 
 	            id="table_id"
-	            value={tableId}
+	            value={table_id}
 	            onChange={handleChange}
             >
 	            <option value={0}>Choose a table</option>
