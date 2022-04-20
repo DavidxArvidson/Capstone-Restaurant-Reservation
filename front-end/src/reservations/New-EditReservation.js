@@ -15,7 +15,6 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 		reservation_time: "",
 		people: "",
 	});
-
 	const [errors, setErrors] = useState([]);
 	const [apiError, setApiError] = useState(null);
 
