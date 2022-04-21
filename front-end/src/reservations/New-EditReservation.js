@@ -61,7 +61,7 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 					.catch(setApiError);
 			}
 			else {
-				createReservation(formData, abortController.signal)
+				createReservation(formData)
 					.then(loadDashboard)
 					.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
 					.catch(setApiError);
