@@ -25,6 +25,8 @@ function Routes() {
   const query = useQuery();
 	const date = query.get("date") ? query.get("date") : today();
 
+  useEffect(loadDashboard, [date]);
+
   function loadDashboard() {
     const abortController = new AbortController();
     setReservationsError(null);
@@ -40,8 +42,6 @@ function Routes() {
     return () => abortController.abort();
   }
 
-  useEffect(loadDashboard, [date]);
-
   return (
     <Switch>
       <Route exact={true} path="/">
@@ -50,16 +50,6 @@ function Routes() {
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
       </Route>
-      <Route path="/dashboard">
-				<Dashboard 
-					date={date}
-					reservations={reservations}
-					reservationsError={reservationsError}
-					tables={tables}
-					tablesError={tablesError}
-					loadDashboard={loadDashboard}
-				/>
-			</Route>
       <Route path="/reservations/new">
 	      <NewEditReservation 
           loadDashboard={loadDashboard}
@@ -71,17 +61,27 @@ function Routes() {
 					edit={true}
 	      />
       </Route>
-      <Route path="/tables/new">
-        <NewTable 
-				  loadDashboard={loadDashboard}
-				/>
-			</Route>
       <Route path="/reservations/:reservation_id/seat">
         <ReservationSeat 
           tables={tables}
 					loadDashboard={loadDashboard}
         />
       </Route>
+      <Route path="/tables/new">
+        <NewTable 
+				  loadDashboard={loadDashboard}
+				/>
+			</Route>
+      <Route path="/dashboard">
+				<Dashboard 
+					date={date}
+					reservations={reservations}
+					reservationsError={reservationsError}
+					tables={tables}
+					tablesError={tablesError}
+					loadDashboard={loadDashboard}
+				/>
+			</Route>
       <Route path="/search">
 	      <Search />
       </Route>
