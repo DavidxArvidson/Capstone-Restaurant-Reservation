@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { listReservations, seatTable } from "../utils/api";
+import { listReservations, seatTable, readReservation } from "../utils/api";
 
 export default function ReservationSeat({ tables, loadDashboard }) {
 	const history = useHistory();
@@ -49,7 +49,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 		const foundErrors = [];
 
 		const foundTable = tables.find((table) => table.table_id === Number(table_id));
-		const foundReservation = reservations.find((reservation) => reservation.reservation_id === Number(reservation_id));
+		const foundReservation = readReservation(reservation_id);
 
 		if (!foundTable) {
 			foundErrors.push("This table does not exist.");
