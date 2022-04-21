@@ -45,11 +45,11 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 		return () => abortController.abort();
 	}
 	
-	async function validateSeat() {
+	function validateSeat() {
 		const foundErrors = [];
 
 		const foundTable = tables.find((table) => table.table_id === Number(table_id));
-		const foundReservation = await readReservation(parseInt(reservation_id));
+		const foundReservation = reservations.find((reservation) => reservation.reservation_id === Number(reservation_id));
 
 		if (!foundTable) {
 			foundErrors.push("This table does not exist.");
