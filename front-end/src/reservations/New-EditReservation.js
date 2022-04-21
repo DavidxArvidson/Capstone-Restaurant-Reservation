@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { createReservation, editReservation, listReservations } from "../utils/api";
+import { createReservation, editReservation, listReservations, readReservation } from "../utils/api";
 
 export default function NewEditReservation({ loadDashboard, edit }) {
 	const history = useHistory();
@@ -22,9 +22,7 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 		if (edit) {
 			if (!reservation_id) return null;
 
-			loadReservations()
-				.then((response) => response.find((reservation) => 
-					reservation.reservation_id === Number(reservation_id)))
+			readReservation(reservation_id)
 				.then(fill);
 		}
 
@@ -44,12 +42,6 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 				reservation_time: foundReservation.reservation_time,
 				people: foundReservation.people,
 			});
-		}
-
-		async function loadReservations() {
-			const abortController = new AbortController();
-			return await listReservations(null, abortController.signal)
-				.catch(setReservationsError);
 		}
 	}, [edit, reservation_id]);
 
