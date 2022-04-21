@@ -49,7 +49,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 		const foundErrors = [];
 
 		const foundTable = tables.find((table) => table.table_id === Number(table_id));
-		const foundReservation = await readReservation(reservation_id);
+		const foundReservation = await readReservation(parseInt(reservation_id));
 
 		if (!foundTable) {
 			foundErrors.push("This table does not exist.");
