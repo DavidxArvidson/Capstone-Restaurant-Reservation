@@ -8,7 +8,7 @@ export default function ReservationTableComp({ reservation, loadDashboard }) {
 	}
 
 	function handleCancel() {
-		if (window.confirm("Are you sure you want to cancel this reservation?")) {
+		if (window.confirm("Do you want to cancel this reservation? This cannot be undone.")) {
 			const abortController = new AbortController();
 
 			updateReservationStatus(reservation.reservation_id, "cancelled", abortController.status)

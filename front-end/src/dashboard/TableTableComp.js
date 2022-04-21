@@ -7,7 +7,7 @@ export default function TableTableComp({ table, loadDashboard }) {
     }
 
 	function handleFinish() {
-		if (window.confirm("Are you sure you want to finish this table?")) {
+		if (window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
 			const abortController = new AbortController();
 
 			finishTable(table.table_id, abortController.signal)

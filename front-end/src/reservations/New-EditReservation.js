@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { createReservation, editReservation, listReservations, readReservation } from "../utils/api";
+import { createReservation, editReservation, readReservation } from "../utils/api";
 
 export default function NewEditReservation({ loadDashboard, edit }) {
 	const history = useHistory();
 	const { reservation_id } = useParams();
-	const [reservationsError, setReservationsError] = useState(null);
 	const [formData, setFormData] = useState({
 		first_name: "",
 		last_name: "",
@@ -114,7 +113,6 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 		<form>
 			{collectErrors()}
 			<ErrorAlert error={apiError} />
-			<ErrorAlert error={reservationsError} />
 
 			<label className="form-label" htmlFor="first_name">First Name:&nbsp;</label>
 			<input
