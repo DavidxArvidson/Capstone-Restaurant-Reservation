@@ -71,7 +71,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 
 	const tableOptions = () => {
 		return tables.map((table) => 
-			<option value={table.table_id}>{table.table_name} - {table.capacity}</option>);
+			<option key={table.table_id} value={table.table_id}>{table.table_name} - {table.capacity}</option>);
 	};
 
 	const errorsJSX = () => {
@@ -91,7 +91,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 	            value={table_id}
 	            onChange={handleChange}
             >
-	            <option value={0}>Choose a table</option>
+	        <option value={0}>Choose a table</option>
 				{tableOptions()}
             </select>
 
