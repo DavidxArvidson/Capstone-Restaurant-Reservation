@@ -9,7 +9,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 	const [table_id, setTableId] = useState(0);
 	const [reservations, setReservations] = useState([]);
 	const [reservationsError, setReservationsError] = useState(null);
-	const [errors, setErrors] = useState([]);
+	const [errors, setErrors] = useState(null);
 	const [apiError, setApiError] = useState(null);
 	const { reservation_id } = useParams();
 
@@ -18,7 +18,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 
     	setReservationsError(null);
 
-    	listReservations(null, abortController.signal)
+    	listReservations(abortController.signal)
       		.then(setReservations)
       		.catch(setReservationsError);
 
