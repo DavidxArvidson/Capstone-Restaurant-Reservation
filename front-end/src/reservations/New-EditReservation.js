@@ -191,8 +191,8 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 				required
 			/>
 
-			<button type="submit" onClick={handleSubmit}>Submit</button>
-			<button type="button" onClick={history.goBack}>Cancel</button>
+			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
+			<button type="button" className="btn btn-secondary" onClick={history.goBack}>Cancel</button>
 	</form>
 	);
 }

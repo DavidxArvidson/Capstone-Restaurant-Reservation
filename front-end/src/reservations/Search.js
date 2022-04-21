@@ -32,15 +32,16 @@ export default function Search() {
         return reservations.length > 0 ?
             reservations.map((reservation) => 
                 <ReservationTableComp key={reservation.reservation_id} reservation={reservation} />) :
-            <p>No reservations found</p>;
+			<tr><td>No reservations found</td></tr>;
     }
 
 	return (
 		<div>
 			<form>
                 <ErrorAlert error={error} />
-				<label htmlFor="mobile_number">Enter the phone number:</label>
+				<label className="form-label" htmlFor="mobile_number">Enter the phone number:</label>
 				<input 
+					className="form-control"
 					name="mobile_number"
 					id="mobile_number"
 					type="tel"
@@ -49,7 +50,7 @@ export default function Search() {
 					required
 				/>
 
-				<button type="submit" onClick={handleSubmit}>Find</button>
+				<button type="submit" className="btn btn-primary" onClick={handleSubmit}>Find</button>
 			</form>
             <table className="table">
 			    <thead className="thead-light">

@@ -6,7 +6,7 @@ import { createTable } from "../utils/api";
 export default function NewTable({ loadDashboard }) {
 	const history = useHistory();
 
-	const [error, setError] = useState([]);
+	const [error, setError] = useState(null);
 	const [formData, setFormData] = useState({
 		table_name: "",
 		capacity: 1,
@@ -49,8 +49,9 @@ export default function NewTable({ loadDashboard }) {
 		<form>
 			<ErrorAlert error={error} />
 
-			<label htmlFor="table_name">Table Name:&nbsp;</label>
+			<label className="form-label" htmlFor="table_name">Table Name:&nbsp;</label>
 			<input 
+				className="form-control"
 				name="table_name"
 				id="table_name"
 				type="text"
@@ -60,8 +61,9 @@ export default function NewTable({ loadDashboard }) {
 				required
 			/>
 
-			<label htmlFor="capacity">Capacity:&nbsp;</label>
+			<label className="form-label" htmlFor="capacity">Capacity:&nbsp;</label>
 			<input 
+				className="form-control"
 				name="capacity"
 				id="capacity"
 				type="number"
@@ -71,8 +73,8 @@ export default function NewTable({ loadDashboard }) {
 				required
 			/>
 
-			<button type="submit" onClick={handleSubmit}>Submit</button>
-			<button type="button" onClick={history.goBack}>Cancel</button>
+			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
+			<button type="button" className="btn btn-secondary" onClick={history.goBack}>Cancel</button>
 		</form>
 	);
 }

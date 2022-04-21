@@ -34,19 +34,19 @@ export default function ReservationTableComp({ reservation, loadDashboard }) {
 				<>
 					<td>
 						<Link to={`/reservations/${reservation.reservation_id}/edit`}>
-							<button type="button">Edit</button>
+							<button type="button" className="btn btn-primary">Edit</button>
 						</Link>
 					</td>
 
 					<td>
-						<button type="button" onClick={handleCancel} data-reservation-id-cancel={reservation.reservation_id}>
+						<button type="button" className="btn btn-secondary" onClick={handleCancel} data-reservation-id-cancel={reservation.reservation_id}>
 							Cancel
 						</button>
 					</td>
 
 					<td>
 						<a href={`/reservations/${reservation.reservation_id}/seat`}>
-							<button type="button">Seat</button>
+							<button type="button" className="btn btn-primary">Seat</button>
 						</a>
 					</td>
 				</>
