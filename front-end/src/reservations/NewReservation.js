@@ -1,63 +1,54 @@
 import React, { useState } from "react";
 import { createReservation } from "../utils/api";
-import { formatAsDate, today } from "../utils/date-time";
+import { formatAsDate } from "../utils/date-time";
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function NewReservation() {
   const history = useHistory();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [dateOfReservation, setDateOfReservation] = useState("");
-  const [timeOfReservation, setTimeOfReservation] = useState("");
-  const [people, setPeople] = useState(1);
   const [errors, setErrors] = useState([]);
   const [apiError, setApiError] = useState(null);
+  const [formData, setFormData] = useState({
+	first_name: "",
+	last_name: "",
+	mobile_number: "",
+	reservation_date: "",
+	reservation_time: "",
+	people: "",
+  });
+
+  function validateFields() {
+	const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
+	const todaysDate = new Date();
+
+	const foundErrors = []
+	
+	if (reserveDate.getDay() === 2) {
+		foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays." });
+	}
+	if (reserveDate < todaysDate) {
+		foundErrors.push({ message: "Reservations cannot be made on a past date." });
+	}
+	if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+		foundErrors.push({ message: "Unfortunately, we are not open until 10:30AM." });
+	} else if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+		foundErrors.push({ message: "Unfortunately, we close at 10:30PM." });
+	} else if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+		foundErrors.push({ message: "Unfortunately, reservations must be made at least an hour before we close at 10:30PM." })
+	}
+
+	setErrors(foundErrors);
+
+	return foundErrors.length === 0;
+}
 
   
   const handleSubmit = async (event) => {
     event.preventDefault();
 	const abortController = new AbortController();
-	const reserveDate = new Date(`${dateOfReservation}T${timeOfReservation}:00.000`);
 
-    if (dateOfReservation < today()) {
-      setErrors([...errors, "Past dates not valid!"]);
-      return;
-    }
-
-	if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
-	  setErrors([...errors, "Reservation cannot be made: Restaurant is not open until 10:30AM."]);
-      return;
-	}
-
-	if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
-		setErrors([...errors, "Reservation cannot be made: Restaurant is closed after 10:30PM."]);
-		return;
-	}
-
-	if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
-		setErrors([...errors, "Reservation cannot be made: Reservation must be made at least an hour before closing (10:30PM)."]);
-		return;
-	}
-
-    let newDate = new Date(dateOfReservation);
-    let dayOfWeek = newDate.getDay();
-    if (dayOfWeek === 1) {
-      setErrors([...errors, "Restaurant is closed on Tuesdays!"]);
-      return;
-    }
-    const reservationObj = {
-      first_name: firstName,
-      last_name: lastName,
-      mobile_number: mobileNumber,
-      reservation_date: dateOfReservation,
-      reservation_time: timeOfReservation,
-      people: parseInt(people),
-    };
-
-    if (errors.length === 0) {
-      createReservation(reservationObj)
+    if (validateFields()) {
+      createReservation(formData)
 				.then(({ reservation_date }) => history.push(`/dashboard?date=${formatAsDate(reservation_date)}`))
 				.catch(setApiError);
     }
@@ -65,24 +56,9 @@ export default function NewReservation() {
 	return () => abortController.abort();
   };
 
-	const handleFirstName = (e) => {
-    	setFirstName(e.target.value);
-  	};
-  	const handleLastName = (e) => {
-    	setLastName(e.target.value);
-  	};
-  	const handleMobileNumber = (e) => {
-    	setMobileNumber(e.target.value);
-  	};
-  	const handleDateOfReservation = (e) => {
-    	setDateOfReservation(e.target.value);
-  	};
-  	const handleTimeOfReservation = (e) => {
-    	setTimeOfReservation(e.target.value);
-  	};
-  	const handlePeople = (e) => {
-    	setPeople(e.target.value);
-  	};
+  function handleChange({ target }) {
+	setFormData({ ...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value });
+  }
 
 	const errorsJSX = () => {
 		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
@@ -99,8 +75,8 @@ export default function NewReservation() {
 				name="first_name"
 				id="first_name"
 				type="text"
-				onChange={handleFirstName}
-				value={firstName}
+				onChange={handleChange}
+				value={formData.first_name}
 				required
 			/>
 
@@ -110,8 +86,8 @@ export default function NewReservation() {
 				name="last_name"
 				id="last_name"
 				type="text"
-				onChange={handleLastName}
-				value={lastName}
+				onChange={handleChange}
+				value={formData.last_name}
 				required
 			/>
 
@@ -121,8 +97,8 @@ export default function NewReservation() {
 				name="mobile_number"
 				id="mobile_number"
 				type="text"
-				onChange={handleMobileNumber}
-				value={mobileNumber}
+				onChange={handleChange}
+				value={formData.mobile_number}
 				required
 			/>
 
@@ -132,8 +108,8 @@ export default function NewReservation() {
 				name="reservation_date" 
 				id="reservation_date"
 				type="date"
-				onChange={handleDateOfReservation}
-				value={dateOfReservation}
+				onChange={handleChange}
+				value={formData.reservation_date}
 				required
 			/>
 
@@ -143,8 +119,8 @@ export default function NewReservation() {
 				name="reservation_time" 
 				id="reservation_time"
 				type="time"
-				onChange={handleTimeOfReservation}
-				value={timeOfReservation}
+				onChange={handleChange}
+				value={formData.reservation_time}
 				required
 			/>
 
@@ -155,8 +131,8 @@ export default function NewReservation() {
 				id="people"
 				type="number"
 				min="1"
-				onChange={handlePeople}
-				value={people}
+				onChange={handleChange}
+				value={formData.people}
 				required
 			/>
 

@@ -18,6 +18,7 @@ export default function EditReservation({ loadDashboard }) {
 	const [apiError, setApiError] = useState(null);
 
 	useEffect(() => {
+		const abortController = new AbortController();
 		if (!reservation_id) return null;
 
 		readReservation(reservation_id)
@@ -40,6 +41,9 @@ export default function EditReservation({ loadDashboard }) {
 				people: foundReservation.people,
 			});
 		}
+
+		return () => abortController.abort();
+		
 	}, [reservation_id]);
 
 	function handleChange({ target }) {
@@ -50,33 +54,28 @@ export default function EditReservation({ loadDashboard }) {
 		event.preventDefault();
 		const abortController = new AbortController();
 
-		const foundErrors = [];
-		if (validateFields(foundErrors) && validateDate(foundErrors)) {
+		if (validateFields()) {
 			editReservation(reservation_id, formData, abortController.signal)
 				.then(loadDashboard)
 				.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
 				.catch(setApiError);
 		}
 
-		setErrors(foundErrors);
-
 		return () => abortController.abort();
 	}
 
-	function validateFields(foundErrors) {
+	
+	function validateFields() {
+		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
+		const todaysDate = new Date();
+
+		const foundErrors = []
+
 		for (const field in formData) {
 			if (formData[field] === "") {
 				foundErrors.push({ message: `${field.split("_").join(" ")} cannot be left blank.`})
 			}
 		}
-
-		return foundErrors.length === 0;
-	}
-
-	
-	function validateDate(foundErrors) {
-		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
-		const todaysDate = new Date();
 		
 		if (reserveDate.getDay() === 1) {
 			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays." });
@@ -91,6 +90,8 @@ export default function EditReservation({ loadDashboard }) {
 		} else if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
 			foundErrors.push({ message: "Unfortunately, reservations must be made at least an hour before we close at 10:30PM." })
 		}
+
+		setErrors(foundErrors);
 
 		return foundErrors.length === 0;
 	}
