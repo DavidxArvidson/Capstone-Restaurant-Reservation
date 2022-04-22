@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { editReservation, readReservation } from "../utils/api";
+import { formatAsDate } from "../utils/date-time";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { editReservation, readReservation } from "../utils/api";
 
 export default function EditReservation({ loadDashboard }) {
 	const history = useHistory();
 	const { reservation_id } = useParams();
+	const [errors, setErrors] = useState([]);
+	const [apiError, setApiError] = useState(null);
 	const [formData, setFormData] = useState({
 		first_name: "",
 		last_name: "",
@@ -14,8 +17,37 @@ export default function EditReservation({ loadDashboard }) {
 		reservation_time: "",
 		people: "",
 	});
-	const [errors, setErrors] = useState([]);
-	const [apiError, setApiError] = useState(null);
+
+	function validateFields() {
+		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
+		const todaysDate = new Date();
+	
+		const foundErrors = []
+	
+		for (const field in formData) {
+			if (formData[field] === "") {
+				foundErrors.push({ message: `${field.split("_").join(" ")} cannot be left blank.`})
+			}
+		}
+		
+		if (reserveDate.getDay() === 2) {
+			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays." });
+		}
+		if (reserveDate < todaysDate) {
+			foundErrors.push({ message: "Reservations cannot be made on a past date." });
+		}
+		if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+			foundErrors.push({ message: "Unfortunately, we are not open until 10:30AM." });
+		} else if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+			foundErrors.push({ message: "Unfortunately, we close at 10:30PM." });
+		} else if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+			foundErrors.push({ message: "Unfortunately, reservations must be made at least an hour before we close at 10:30PM." })
+		}
+	
+		setErrors(foundErrors);
+	
+		return foundErrors.length === 0;
+	}
 
 	useEffect(() => {
 		const abortController = new AbortController();
@@ -46,54 +78,21 @@ export default function EditReservation({ loadDashboard }) {
 		
 	}, [reservation_id]);
 
-	function handleChange({ target }) {
-		setFormData({ ...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value });
-	}
-
 	function handleSubmit(event) {
 		event.preventDefault();
 		const abortController = new AbortController();
 
 		if (validateFields()) {
-			editReservation(reservation_id, formData, abortController.signal)
-				.then(loadDashboard)
-				.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
+			editReservation(reservation_id, formData)
+				.then(({ reservation_date }) => history.push(`/dashboard?date=${formatAsDate(reservation_date)}`))
 				.catch(setApiError);
 		}
 
 		return () => abortController.abort();
 	}
 
-	
-	function validateFields() {
-		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
-		const todaysDate = new Date();
-
-		const foundErrors = []
-
-		for (const field in formData) {
-			if (formData[field] === "") {
-				foundErrors.push({ message: `${field.split("_").join(" ")} cannot be left blank.`})
-			}
-		}
-		
-		if (reserveDate.getDay() === 1) {
-			foundErrors.push({ message: "Unfortunately, we are closed on Tuesdays." });
-		}
-		if (reserveDate < todaysDate) {
-			foundErrors.push({ message: "Reservations cannot be made on a past date." });
-		}
-		if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
-			foundErrors.push({ message: "Unfortunately, we are not open until 10:30AM." });
-		} else if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
-			foundErrors.push({ message: "Unfortunately, we close at 10:30PM." });
-		} else if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
-			foundErrors.push({ message: "Unfortunately, reservations must be made at least an hour before we close at 10:30PM." })
-		}
-
-		setErrors(foundErrors);
-
-		return foundErrors.length === 0;
+	function handleChange({ target }) {
+		setFormData({ ...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value });
 	}
 
 	const errorsJSX = () => {
