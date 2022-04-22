@@ -4,7 +4,7 @@ import { formatAsDate } from "../utils/date-time";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function EditReservation({ loadDashboard }) {
+export default function EditReservation() {
 	const history = useHistory();
 	const { reservation_id } = useParams();
 	const [errors, setErrors] = useState([]);

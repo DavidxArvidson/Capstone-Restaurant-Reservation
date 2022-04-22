@@ -68,8 +68,8 @@
      .then(formatReservationTime);
  }
 
- export async function readReservation(id, signal) {
-  const url = `${API_BASE_URL}/reservations/${id}`;
+ export async function readReservation(reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
   return await fetchJson(url, { headers, signal }, []);
 }
 
