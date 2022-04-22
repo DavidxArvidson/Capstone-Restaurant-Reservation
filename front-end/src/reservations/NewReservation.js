@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { createReservation } from "../utils/api";
 import { formatAsDate, today } from "../utils/date-time";
-import { Link, useHistory } from "react-router-dom";
-import ReservationError from "./ReservationError";
+import { useHistory } from "react-router-dom";
+import ErrorAlert from "../layout/ErrorAlert";
 
-function NewReservation() {
+export default function NewReservation() {
   const history = useHistory();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -12,26 +12,39 @@ function NewReservation() {
   const [dateOfReservation, setDateOfReservation] = useState("");
   const [timeOfReservation, setTimeOfReservation] = useState("");
   const [people, setPeople] = useState(1);
-  const [error, setError] = useState([]);
+  const [errors, setErrors] = useState([]);
+  const [apiError, setApiError] = useState(null);
 
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+	const abortController = new AbortController();
+	const reserveDate = new Date(`${dateOfReservation}T${timeOfReservation}:00.000`);
+
     if (dateOfReservation < today()) {
-      setError([...error, "Past dates not valid!"]);
+      setErrors([...errors, "Past dates not valid!"]);
       return;
     }
 
-    let replacedTime = timeOfReservation.replace(":", "");
-    if (replacedTime < 1030 || replacedTime > 2130) {
-      setError([...error, "Outside operating hours!"]);
+	if (reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+	  setErrors([...errors, "Reservation cannot be made: Restaurant is not open until 10:30AM."]);
       return;
-    }
+	}
+
+	if (reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+		setErrors([...errors, "Reservation cannot be made: Restaurant is closed after 10:30PM."]);
+		return;
+	}
+
+	if (reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+		setErrors([...errors, "Reservation cannot be made: Reservation must be made at least an hour before closing (10:30PM)."]);
+		return;
+	}
 
     let newDate = new Date(dateOfReservation);
     let dayOfWeek = newDate.getDay();
     if (dayOfWeek === 1) {
-      setError([...error, "Restaurant is closed on Tuesdays!"]);
+      setErrors([...errors, "Restaurant is closed on Tuesdays!"]);
       return;
     }
     const reservationObj = {
@@ -43,146 +56,112 @@ function NewReservation() {
       people: parseInt(people),
     };
 
-    const newReservation = await createReservation(reservationObj);
-    const { reservation_date } = newReservation;
+    if (errors.length === 0) {
+      createReservation(reservationObj)
+				.then(({ reservation_date }) => history.push(`/dashboard?date=${formatAsDate(reservation_date)}`))
+				.catch(setApiError);
+    }
 
-    history.push(`/dashboard?date=${formatAsDate(reservation_date)}`);
-  };
-
-  const handleFirstName = (e) => {
-    setFirstName(e.target.value);
-  };
-  const handleLastName = (e) => {
-    setLastName(e.target.value);
-  };
-  const handleMobileNumber = (e) => {
-    setMobileNumber(e.target.value);
-  };
-  const handleDateOfReservation = (e) => {
-    setDateOfReservation(e.target.value);
-  };
-  const handleTimeOfReservation = (e) => {
-    setTimeOfReservation(e.target.value);
-  };
-  const handlePeople = (e) => {
-    setPeople(e.target.value);
+	return () => abortController.abort();
   };
 
-  const goBack = () => {
-    history.goBack();
-  };
+	const handleFirstName = (e) => {
+    	setFirstName(e.target.value);
+  	};
+  	const handleLastName = (e) => {
+    	setLastName(e.target.value);
+  	};
+  	const handleMobileNumber = (e) => {
+    	setMobileNumber(e.target.value);
+  	};
+  	const handleDateOfReservation = (e) => {
+    	setDateOfReservation(e.target.value);
+  	};
+  	const handleTimeOfReservation = (e) => {
+    	setTimeOfReservation(e.target.value);
+  	};
+  	const handlePeople = (e) => {
+    	setPeople(e.target.value);
+  	};
+
+	const errorsJSX = () => {
+		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
+	};
 
   return (
-    <div>
-      {error.length
-        ? error.map((err) => {
-            return <ReservationError key={err} error={err} />;
-          })
-        : ""}
+		<form>
+			{errorsJSX()}
+			<ErrorAlert error={apiError} />
 
-      <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <Link to="/">Home</Link>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            Create Reservation
-          </li>
-        </ol>
-      </nav>
+			<label className="form-label" htmlFor="first_name">First Name:&nbsp;</label>
+			<input
+				className="form-control"
+				name="first_name"
+				id="first_name"
+				type="text"
+				onChange={handleFirstName}
+				value={firstName}
+				required
+			/>
 
-      <h2>Create Reservation</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="first_name" className="form-label">
-            First name:
-          </label>
-          <input
-            name="first_name"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            placeholder="Mandatory first name (cannot contain numbers or special characters)"
-            onChange={handleFirstName}
-            required
-          ></input>
-          <label htmlFor="last_name" className="form-label">
-            Last name:
-          </label>
-          <input
-            name="last_name"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            placeholder="Mandatory last name (cannot contain numbers or special characters)"
-            onChange={handleLastName}
-            required
-          ></input>
-          <label htmlFor="mobile_number" className="form-label">
-            Mobile number:
-          </label>
-          <input
-            name="mobile_number"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            type="tel"
-            placeholder="###-###-####"
-            onChange={handleMobileNumber}
-            required
-          ></input>
-          <label htmlFor="reservation_date" className="form-label">
-            Date:
-          </label>
-          <input
-            name="reservation_date"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            type="date"
-            placeholder="YYYY-MM-DD"
-            pattern="\d{4}-\d{2}-\d{2}"
-            onChange={handleDateOfReservation}
-            required
-          ></input>
-          <label htmlFor="reservation_time" className="form-label">
-            Time:
-          </label>
-          <input
-            name="reservation_time"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            type="time"
-            placeholder="HH:MM"
-            pattern="[0-9]{2}:[0-9]{2}"
-            onChange={handleTimeOfReservation}
-            required
-          ></input>
-          <label htmlFor="people" className="form-label">
-            People:
-          </label>
-          <input
-            name="people"
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-            placeholder="Enter party size (min 1)"
-            onChange={handlePeople}
-            required
-          ></input>
-        </div>
-        <button type="button" onClick={goBack} className="btn btn-danger">
-          Cancel
-        </button>
-        {``} {``} {``} {``}
-        <button type="submit" className="btn btn-success">
-          Submit
-        </button>
-        {``} {``} {``} {``}
-      </form>
-    </div>
-  );
+			<label className="form-label" htmlFor="last_name">Last Name:&nbsp;</label>
+			<input 
+				className="form-control"
+				name="last_name"
+				id="last_name"
+				type="text"
+				onChange={handleLastName}
+				value={lastName}
+				required
+			/>
+
+			<label className="form-label" htmlFor="mobile_number">Mobile Number:&nbsp;</label>
+			<input 
+				className="form-control"
+				name="mobile_number"
+				id="mobile_number"
+				type="text"
+				onChange={handleMobileNumber}
+				value={mobileNumber}
+				required
+			/>
+
+			<label className="form-label" htmlFor="reservation_date">Reservation Date:&nbsp;</label>
+			<input 
+				className="form-control"
+				name="reservation_date" 
+				id="reservation_date"
+				type="date"
+				onChange={handleDateOfReservation}
+				value={dateOfReservation}
+				required
+			/>
+
+			<label className="form-label" htmlFor="reservation_time">Reservation Time:&nbsp;</label>
+			<input 
+				className="form-control"
+				name="reservation_time" 
+				id="reservation_time"
+				type="time"
+				onChange={handleTimeOfReservation}
+				value={timeOfReservation}
+				required
+			/>
+
+			<label className="form-label" htmlFor="people">Party Size:&nbsp;</label>
+			<input 
+				className="form-control"
+				name="people"
+				id="people"
+				type="number"
+				min="1"
+				onChange={handlePeople}
+				value={people}
+				required
+			/>
+
+			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
+			<button type="button" className="btn btn-secondary" onClick={history.goBack}>Cancel</button>
+	</form>
+	);
 }
-
-export default NewReservation;

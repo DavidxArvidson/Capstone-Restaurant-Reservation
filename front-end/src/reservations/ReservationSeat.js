@@ -48,20 +48,20 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 	function validateSeat() {
 		const foundErrors = [];
 
-		const foundTable = tables.find((table) => table.table_id === Number(table_id));
-		const foundReservation = reservations.find((reservation) => reservation.reservation_id === Number(reservation_id));
+		const foundTable = tables.find(
+			(table) => table.table_id === parseInt(table_id)
+		);
+		const foundReservation = reservations.find(
+			(reservation) => reservation.reservation_id === parseInt(reservation_id));
 
 		if (!foundTable) {
 			foundErrors.push("This table does not exist.");
 		} else if (!foundReservation) {
 			foundErrors.push("This reservation does not exist.")
-		} else {
-			if (foundTable.status === "occupied") {
-				foundErrors.push("This table is occupied.")
-			}
-            if (foundTable.capacity < foundReservation.people) {
-				foundErrors.push(`This table cannot seat ${foundReservation.people} people.`)
-			}
+		} else if (foundTable.status === "occupied") {
+			foundErrors.push("This table is occupied.")
+		} else if (foundTable.capacity < foundReservation.people) {
+			foundErrors.push(`This table cannot seat ${foundReservation.people} people.`)
 		}
 
 		setErrors(foundErrors);

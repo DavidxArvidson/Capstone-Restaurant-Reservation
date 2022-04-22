@@ -57,7 +57,6 @@ function Routes() {
       <Route path="/reservations/:reservation_id/edit">
 				<EditReservation 
 					loadDashboard={loadDashboard}
-					edit={true}
 				/>
 			</Route>
       <Route path="/reservations/:reservation_id/seat">

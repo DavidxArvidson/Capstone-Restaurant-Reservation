@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { createReservation, editReservation, readReservation } from "../utils/api";
+import { editReservation, readReservation } from "../utils/api";
 
-export default function NewEditReservation({ loadDashboard, edit }) {
+export default function EditReservation({ loadDashboard }) {
 	const history = useHistory();
 	const { reservation_id } = useParams();
 	const [formData, setFormData] = useState({
@@ -18,12 +18,10 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 	const [apiError, setApiError] = useState(null);
 
 	useEffect(() => {
-		if (edit) {
-			if (!reservation_id) return null;
+		if (!reservation_id) return null;
 
-			readReservation(reservation_id)
-				.then(fill);
-		}
+		readReservation(reservation_id)
+			.then(fill);
 
 		function fill(foundReservation) {
 			if (!foundReservation || foundReservation.status !== "booked") {
@@ -42,7 +40,7 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 				people: foundReservation.people,
 			});
 		}
-	}, [edit, reservation_id]);
+	}, [reservation_id]);
 
 	function handleChange({ target }) {
 		setFormData({ ...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value });
@@ -54,18 +52,10 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 
 		const foundErrors = [];
 		if (validateFields(foundErrors) && validateDate(foundErrors)) {
-			if (edit) {
-				editReservation(reservation_id, formData, abortController.signal)
-					.then(loadDashboard)
-					.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
-					.catch(setApiError);
-			}
-			else {
-				createReservation(formData, abortController.signal)
-					.then(loadDashboard)
-					.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
-					.catch(setApiError);
-			}
+			editReservation(reservation_id, formData, abortController.signal)
+				.then(loadDashboard)
+				.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
+				.catch(setApiError);
 		}
 
 		setErrors(foundErrors);
@@ -105,13 +95,13 @@ export default function NewEditReservation({ loadDashboard, edit }) {
 		return foundErrors.length === 0;
 	}
 
-	const collectErrors = () => {
+	const errorsJSX = () => {
 		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
-	}
+	};
 
 	return (
 		<form>
-			{collectErrors()}
+			{errorsJSX()}
 			<ErrorAlert error={apiError} />
 
 			<label className="form-label" htmlFor="first_name">First Name:&nbsp;</label>
