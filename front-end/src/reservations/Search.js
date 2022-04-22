@@ -3,7 +3,7 @@ import { listReservations } from "../utils/api";
 import ReservationTableComp from "../dashboard/ReservationTableComp"
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function Search() {
+export default function Search({ loadDashboard }) {
     const [mobileNumber, setMobileNumber] = useState("");
 
     const [reservations, setReservations] = useState([]);
@@ -29,10 +29,12 @@ export default function Search() {
     }
 
     const searchResults = () => {
-        return reservations.length > 0 ?
-            reservations.map((reservation) => 
-                <ReservationTableComp key={reservation.reservation_id} reservation={reservation} />) :
-			<tr><td>No reservations found</td></tr>;
+        if (reservations.length > 0) {
+            return reservations.map((reservation) => 
+      			<ReservationTableComp key={reservation.reservation_id} reservation={reservation} loadDashboard={loadDashboard} />);
+		} else {
+			return <tr><td>No reservations found</td></tr>;
+		}
     }
 
 	return (

@@ -82,7 +82,9 @@ function Routes() {
 				/>
 			</Route>
       <Route path="/search">
-	      <Search />
+	      <Search 
+          loadDashboard={loadDashboard}
+        />
       </Route>
       <Route>
         <NotFound />
