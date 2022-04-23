@@ -11,6 +11,7 @@ const reservationsRouter = require("./reservations/reservations.router");
 const tablesRouter = require("./tables/tables.router");
 
 const app = express();
+app.listen(process.env.PORT || 3000);
 
 app.use(cors());
 app.use(express.json());
