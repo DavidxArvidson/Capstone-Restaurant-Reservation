@@ -75,7 +75,7 @@ export default function ReservationSeat({ tables, loadDashboard }) {
 	};
 
 	const errorsJSX = () => {
-		return errors.map((error, idx) => <ErrorAlert key={idx} error={error} />);
+		return errors.map((error) => <ErrorAlert key={error} error={error} />);
 	};
 
     
