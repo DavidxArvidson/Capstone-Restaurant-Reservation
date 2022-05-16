@@ -8,7 +8,29 @@ This project was developed as an assignment in the Thinkful.com engineering cour
 
 I developed the full-stack of this application using JavaScript ES6, React.js, Node.js, Express, PostgreSQL, Bootstrap, RESTful API's, and Knex.
 
-SCREENSHOTS
+The initial dashboard of the application looks like this:
+
+![Initial Dashboard](images/DashboardOriginal.png)
+
+After creating some example reservations and tables, the dashboard would look something like this:
+
+![Dashboard with Data](images/DashboardWithData.png)
+
+The Create Reservation page (Which is nearly identical to the Edit Reservation Page) looks like this:
+
+![Create-Edit Reservation Page](images/Create-EditRes.png)
+
+Clicking on the "New Table" navigation link on the left-hand side would lead the user to this page:
+
+![Create Table Page](images/CreateTable.png)
+
+When the user attempts to seat an existing reservation, they would be redirected to the following page to do this:
+
+![Seat Reservation Page](images/SeatRes.png)
+
+Finally, this application allows the user to search for an existing reservation with a phone number. That would look something like this:
+
+![Search Reservation Page](images/SearchRes.png)
 
 This application also includes a variety of tests, the information on which is found below.
 
